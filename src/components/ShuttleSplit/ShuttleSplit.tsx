@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState, type ChangeEvent, type RefObject } from 'react'
+import { Fragment, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import main_icon from '../../assets/main-icon.png'
 
 import './ShuttleSplit.css'
@@ -17,9 +17,9 @@ const ShuttleSplit = () => {
   const [templates, setTemplates] = useState<Map<number, Template>>(new Map())
   const [selectedTemplateType, setSelectedTemplateType] = useState<string>(formTypeList[0])
   const [calculationData, setCalCulationData] = useState<ShuttleSplitCalculationCost>();
-  const { register, handleSubmit, setValue, formState: { errors }, reset, getValues } = useForm();
+  const { register, handleSubmit, setValue, reset, getValues } = useForm();
 
-  const scrollFocusRef = useRef<HTMLTableElement>()
+  const scrollFocusRef = useRef<HTMLTableElement>(null)
 
   const handleOnChangeTemplate = (event: ChangeEvent<HTMLSelectElement>) => {
     event.preventDefault()
@@ -61,6 +61,7 @@ const ShuttleSplit = () => {
       })
       .catch((error) => {
         setCalCulationData(undefined)
+        console.log("Fetch data error: ", error)
       });
   }
 
@@ -151,7 +152,7 @@ const ShuttleSplit = () => {
                   Object.keys(calculationData.cost).map((key: string, index) => {
                     return <tr key={`_${index}`}>
                       <td>{key}</td>
-                      <td>{calculationData.cost[key]}</td>
+                      <td>{calculationData.cost.get(key) || ""}</td>
                     </tr>
                   })
                 }

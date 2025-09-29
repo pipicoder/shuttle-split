@@ -1,4 +1,3 @@
-import React from 'react'
 import './Home.css'
 import Footer from "../../components/Footer/Footer"
 import ShuttleSplit from "../../components/ShuttleSplit/ShuttleSplit"
