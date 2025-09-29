@@ -3,7 +3,7 @@ export type ShuttleSplitCalculationData = {
 }
 
 export type ShuttleSplitCalculationCost = {
-  cost: Map<string, number>
+  cost: Record<string, any>
 }
 
 export class HttpShuttleSplitCalculationResponse {
@@ -11,7 +11,7 @@ export class HttpShuttleSplitCalculationResponse {
   constructor(data?: ShuttleSplitCalculationData){
     this.data = data
   }
-  public getCost = (): Map<string, number> | undefined=> {
+  public getCost = (): object | undefined => {
     return this.data?.data.cost
   }
   public getData = (): ShuttleSplitCalculationCost | undefined => {

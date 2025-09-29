@@ -152,7 +152,7 @@ const ShuttleSplit = () => {
                   Object.keys(calculationData.cost).map((key: string, index) => {
                     return <tr key={`_${index}`}>
                       <td>{key}</td>
-                      <td>{calculationData.cost.get(key) || ""}</td>
+                      <td>{calculationData.cost[key] || ""}</td>
                     </tr>
                   })
                 }
