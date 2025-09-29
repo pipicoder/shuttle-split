@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useRef, useState, type ChangeEvent } from 'react'
-import main_icon from '../../assets/main-icon.png'
+import { Fragment, useEffect, useRef, useState, type ChangeEvent} from 'react'
+import main_icon from '../../assets/main-icon.webp'
 
 import './ShuttleSplit.css'
 import { useForm } from "react-hook-form"
@@ -18,7 +18,7 @@ const ShuttleSplit = () => {
   const [templates, setTemplates] = useState<Map<number, Template>>(new Map())
   const [selectedTemplateType, setSelectedTemplateType] = useState<string>(formTypeList[0])
   const [calculationData, setCalculationData] = useState<ShuttleSplitCalculationCost>();
-  const { register, handleSubmit, setValue, reset, getValues } = useForm();
+  const { register, handleSubmit, setValue, reset, getValues, formState } = useForm();
 
   const scrollFocusRef = useRef<HTMLTableElement>(null)
 
@@ -43,7 +43,7 @@ const ShuttleSplit = () => {
     return valueList.filter((item: string) => item.trim() !== "")
   }
 
-  const onSubmit = (formData: any) => {
+  const onSubmitForm = (formData: any) => {
     let requestForm = null
     let endpoint: string = "Not Found"
     if (selectedTemplateType === formTypeList[1]) {
@@ -73,6 +73,7 @@ const ShuttleSplit = () => {
           setTemplates(response.getTemplateMap())
         })
         .catch((error) => console.error('Error fetching data:', error));
+    calculationData && formState.isSubmitted && scrollFocusRef.current?.lastElementChild?.scrollIntoView({ behavior: "smooth" }) || ""
   }, [
     calculationData
   ]);
@@ -80,7 +81,7 @@ const ShuttleSplit = () => {
   return (
     <div className="shuttle-split">
       <div className="shuttle-split-form">
-        <img src={main_icon} alt="" />
+        <img src={main_icon} rel="preload" alt="" />
         <h2>Session Cost Calculator</h2>
         <div className="option">
           <label htmlFor="sessionTemplate">Session Template:</label>
@@ -95,7 +96,7 @@ const ShuttleSplit = () => {
             }
           </select>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmitForm)}>
           <label htmlFor="billType">Billing Type:</label>
           <select id="billType" value={selectedTemplateType} onChange={e => { setSelectedTemplateType(e.target.value) }}>
             {
@@ -132,7 +133,7 @@ const ShuttleSplit = () => {
           <input id="shuttlePrice" type="number" min={1} placeholder="26"
             {...register("shuttlePrice", { valueAsNumber: true })}
           />
-          <input className="btn btn-normal" type="submit" value="Calculate" />
+          <input className="btn btn-normal" type="submit" value="Calculate" disabled={formState.isSubmitting}/>
         </form>
       </div>
       <div className="costs-list" id="costs">
@@ -161,9 +162,6 @@ const ShuttleSplit = () => {
                 }
               </tbody>
             </table>
-            {
-              calculationData && scrollFocusRef.current?.lastElementChild?.scrollIntoView({ behavior: "smooth" }) || ""
-            }
           </Fragment>
         }
       </div>
