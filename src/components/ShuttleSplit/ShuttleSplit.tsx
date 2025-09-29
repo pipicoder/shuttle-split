@@ -1,36 +1,167 @@
-import React from 'react'
-import main_icon from '../../../public/main-icon .png'
+import React, { Fragment, useEffect, useRef, useState, type ChangeEvent, type RefObject } from 'react'
+import main_icon from '../../assets/main-icon.png'
 
 import './ShuttleSplit.css'
+import { useForm } from "react-hook-form"
+import type { Template } from "../../common/models/Template"
+import { ShuttleSplitCalculationEquallyRequestForm, ShuttleSplitCalculationWeightedRequestForm } from "../../common/requestForm/HttpShuttleSplitCalculationRequest"
+import { HttpShuttleSplitCalculationResponse, type ShuttleSplitCalculationCost, } from "../../common/responseForm/HttpShuttleSplitCalculationResponse"
+import { httpPost } from "../../common/requestForm/HttpRequest"
 
 const ShuttleSplit = () => {
+
+  const formTypeList: string[] = ["equally", "weighted"]
+  const columns = { name: "Name", fee: "Fee" }
+  const listSeparatorRegx = /\s*,\s*/
+
+  const [templates, setTemplates] = useState<Map<number, Template>>(new Map())
+  const [selectedTemplateType, setSelectedTemplateType] = useState<string>(formTypeList[0])
+  const [calculationData, setCalCulationData] = useState<ShuttleSplitCalculationCost>();
+  const { register, handleSubmit, setValue, formState: { errors }, reset, getValues } = useForm();
+
+  const scrollFocusRef = useRef<HTMLTableElement>()
+
+  const handleOnChangeTemplate = (event: ChangeEvent<HTMLSelectElement>) => {
+    event.preventDefault()
+    const templateId = Number(event.target.value)
+    if (templateId !== -1) {
+      const item = templates.get(templateId) as Template
+      Object.keys(item).map((key: string) => {
+        setValue(key, item[key as keyof Template])
+      })
+      setValue("numberOfPlayers", item.players?.length)
+      setSelectedTemplateType(formTypeList[item.billingType - 1])
+    } else {
+      reset();
+      setSelectedTemplateType(formTypeList[0])
+    }
+  }
+
+  const handleListInput = (value: string) => {
+    const valueList = typeof value === 'string' ? value.split(listSeparatorRegx) : getValues("players") || []
+    return valueList.filter((item: string) => item.trim() !== "")
+  }
+
+  const onSubmit = (formData: any) => {
+    let requestForm = null
+    let endpoint: string = "Not Found"
+    if (selectedTemplateType === formTypeList[1]) {
+      endpoint = "/api/sessions/calc-cost-weighted"
+      requestForm = new ShuttleSplitCalculationWeightedRequestForm(formData)
+    } else if (selectedTemplateType === formTypeList[0]) {
+      endpoint = "/api/sessions/calc-cost-equally"
+      requestForm = new ShuttleSplitCalculationEquallyRequestForm(formData)
+    }
+    const response = new HttpShuttleSplitCalculationResponse()
+
+    httpPost(endpoint, {}, { ...requestForm })
+      .then((res) => {
+        response.data = res.data
+        setCalCulationData(response.getData())
+      })
+      .catch((error) => {
+        setCalCulationData(undefined)
+      });
+  }
+
+  useEffect(() => {
+    fetch('/api/sessions/templates')
+      .then((response) => response.json())
+      .then((res) => setTemplates(new Map(res?.data?.map((item: Template) => {
+        return [item.id, item]
+      }))))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, [
+    calculationData
+  ]);
+
   return (
     <div className="shuttle-split">
       <div className="shuttle-split-form">
         <img src={main_icon} alt="" />
         <h2>Session Cost Calculator</h2>
-        <form>
+        <div className="option">
           <label htmlFor="sessionTemplate">Session Template:</label>
-          <select name="sessionTemplate" title="Select a template">
-            <option value={"template1"}>Template_1</option>
-            <option value={"template2"}>Template_2</option>
-            <option value={"template3"}>Template_3</option>
+          <select id="sessionTemplate" title="Select a template" onChange={(e) => handleOnChangeTemplate(e)}>
+            <option value={-1}>-- Please select a template ---</option>
+            {
+              [...templates?.values()].map((template) => {
+                return (
+                  <option key={template.id} value={template.id}>{template.name}</option>
+                )
+              })
+            }
           </select>
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <label htmlFor="billType">Billing Type:</label>
-          <select name="billType">
-            <option value="weighted">Weighted</option>
-            <option value="equally">Equally</option>
+          <select id="billType" value={selectedTemplateType} onChange={e => { setSelectedTemplateType(e.target.value) }}>
+            {
+              formTypeList?.map((formType: string) => {
+                return <option value={formType} key={formType}>{formType[0].toUpperCase() + formType.slice(1)}</option>
+              })
+            }
           </select>
-          <label htmlFor="players">Players (comman-separated):</label>
-          <input name="players" placeholder="Đạt, Thảo, Văn, Huy, Vu, Thịnh" />
+          <div style={{ display: selectedTemplateType === "weighted" ? "inherit" : "none" }}>
+            <label htmlFor="players">Players (comman-separated):</label>
+            <input id="players" type="text" placeholder="Đạt, Thảo, Văn, Huy, Vu, Thịnh"
+              {...register("players",
+                {
+                  setValueAs: (value) => handleListInput(value)
+                })
+              }
+            />
+          </div>
+          <div style={{ display: selectedTemplateType === "equally" ? "inherit" : "none" }}>
+            <label htmlFor="numberOfPlayers">Number of Players:</label>
+            <input id="numberOfPlayers" type="number" min={1} placeholder="5" {...register("numberOfPlayers")}
+            />
+          </div>
           <label htmlFor="rentalCost">Rental Cost:</label>
-          <input name="rentalCost" type="number" min={1} placeholder="200" />
+          <input id="rentalCost" type="number" min={1} placeholder="200"
+            {...register("rentalCost", { valueAsNumber: true })}
+          />
           <label htmlFor="shuttleAmount">Shuttle Amount:</label>
-          <input name="shuttleAmount" type="number" min={1} placeholder="3" />
+          <input id="shuttleAmount" type="number" min={1} placeholder="3" {...register("shuttleAmount")}
+          />
           <label htmlFor="shuttlePrice">Shuttle Prices</label>
-          <input name="shuttlePrice" type="number" min={1} placeholder="26" />
-          <button className="btn-normal">Calculate</button>
+          <input id="shuttlePrice" type="number" min={1} placeholder="26" {...register("shuttlePrice")}
+          />
+          <input className="btn btn-normal" type="submit" value="Calculate" />
         </form>
+      </div>
+      <div className="costs-list" id="costs">
+        {
+          calculationData &&
+          <Fragment>
+            <table className="table" ref={scrollFocusRef}>
+              <thead>
+                <tr>
+                  {
+                    Object.keys(columns).map((k: string) => {
+                      return <th key={k}>{columns[k as keyof typeof columns]}</th>
+                    })
+                  }
+                </tr>
+              </thead>
+
+              <tbody>
+                {
+                  calculationData &&
+                  Object.keys(calculationData.cost).map((key: string, index) => {
+                    return <tr key={`_${index}`}>
+                      <td>{key}</td>
+                      <td>{calculationData.cost[key]}</td>
+                    </tr>
+                  })
+                }
+              </tbody>
+            </table>
+            {
+              calculationData && scrollFocusRef.current?.lastElementChild?.scrollIntoView({ behavior: "smooth" }) || ""
+            }
+          </Fragment>
+        }
       </div>
     </div>
   )

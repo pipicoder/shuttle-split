@@ -1,5 +1,8 @@
 .shuttle-split {
   padding: 20px 6%;
+  background-image: url('./../../assets/split-form-background.png');
+  min-height: 100vh;
+  height: 100%;
 }
 
 .shuttle-split-form {
@@ -14,13 +17,14 @@
   padding: 20px 0;
 }
 
+
 .shuttle-split-form img {
   margin: auto;
-  height: 100px;
+  height: 150px;
   display: block;
 }
 
-.shuttle-split-form button {
+.btn {
   outline: 0;
   border: 0;
   border-radius: 0;
@@ -28,7 +32,7 @@
   font-weight: 500;
   padding: 20px;
   cursor: pointer;
-  opacity: 0.7;
+  margin-top: 20px;
 }
 
 .shuttle-split-form button:hover {
@@ -36,13 +40,12 @@
 }
 
 .btn-normal {
-  background-color: #39545e;
-  opacity: 0.7;
+  background-color: #537b89;
   color: white;
 }
 
 .btn-normal:hover {
-  opacity: 1;
+  background-color: #39545e;
   font-weight: 600;
 }
 
@@ -50,6 +53,9 @@
   display: grid;
   grid-template-columns: auto;
   margin-bottom: 20px;
+  background-color: rgb(50, 99, 106, 0.5);
+  padding: 20px;
+  border-radius: 5px;
 }
 
 .shuttle-split-form label {
@@ -62,6 +68,8 @@
   padding: 16px;
   margin: 10px 0;
   box-sizing: border-box;
+  border-radius: 5px;
+  border: 0;
 }
 
 select,
@@ -75,6 +83,7 @@ h2 {
 
 select {
   flex: 1;
+  background-color: #dddddd;
 }
 
 select {
@@ -204,4 +213,43 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.option {
+  display: grid;
+  margin: 20px 0;
+}
+
+.costs-list {
+  max-width: 450px;
+  margin: 30px auto;
+  display: block;
+}
+
+.table {
+  width: 100%;
+}
+
+.table th {
+  text-align: left;
+  background-color: rgb(128, 128, 128, 0.5);
+  /* border-radius: 4px; */
+  padding: 20px 5px;
+}
+
+.table td {
+  text-align: left;
+  padding: 10px 5px;
+}
+
+.table tbody>tr:nth-child(odd) {
+  background-color: rgb(83, 123, 137, 0.9);
+  color: white;
+  font-size: 16px;
+}
+
+.table tbody>tr:nth-child(even) {
+  background-color: rgb(57, 84, 94, 0.9);
+  color: white;
+  font-size: 16px;
 }
