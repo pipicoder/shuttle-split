@@ -17,7 +17,7 @@ const ShuttleSplit = () => {
 
   const [templates, setTemplates] = useState<Map<number, Template>>(new Map())
   const [selectedTemplateType, setSelectedTemplateType] = useState<string>(formTypeList[0])
-  const [calculationData, setCalCulationData] = useState<ShuttleSplitCalculationCost>();
+  const [calculationData, setCalculationData] = useState<ShuttleSplitCalculationCost>();
   const { register, handleSubmit, setValue, reset, getValues } = useForm();
 
   const scrollFocusRef = useRef<HTMLTableElement>(null)
@@ -47,33 +47,32 @@ const ShuttleSplit = () => {
     let requestForm = null
     let endpoint: string = "Not Found"
     if (selectedTemplateType === formTypeList[1]) {
-      endpoint = "/api/sessions/calc-cost-weighted"
+      endpoint = "/sessions/calc-cost-weighted"
       requestForm = new ShuttleSplitCalculationWeightedRequestForm(formData)
     } else if (selectedTemplateType === formTypeList[0]) {
-      endpoint = "/api/sessions/calc-cost-equally"
+      endpoint = "/sessions/calc-cost-equally"
       requestForm = new ShuttleSplitCalculationEquallyRequestForm(formData)
     }
     const response = new HttpShuttleSplitCalculationResponse()
-
     httpPost(endpoint, {}, { ...requestForm })
       .then((res) => {
         response.data = res.data
-        setCalCulationData(response.getData())
+        setCalculationData(response.getData())
       })
       .catch((error) => {
-        setCalCulationData(undefined)
+        setCalculationData(undefined)
         console.log("Fetch data error: ", error)
       });
   }
 
   useEffect(() => {
-    httpGet('/api/sessions/templates')
-      .then((res) => {
-        const response = new HttpShuttleSplitGetTemplatesResponse(res.data)
-        setTemplates(response.getTemplateMap())
-      }
-      )
-      .catch((error) => console.error('Error fetching data:', error));
+    if (templates.size === 0)
+      httpGet('/sessions/templates')
+        .then((res) => {
+          const response = new HttpShuttleSplitGetTemplatesResponse(res.data)
+          setTemplates(response.getTemplateMap())
+        })
+        .catch((error) => console.error('Error fetching data:', error));
   }, [
     calculationData
   ]);
@@ -117,7 +116,8 @@ const ShuttleSplit = () => {
           </div>
           <div style={{ display: selectedTemplateType === "equally" ? "inherit" : "none" }}>
             <label htmlFor="numberOfPlayers">Number of Players:</label>
-            <input id="numberOfPlayers" type="number" min={1} placeholder="5" {...register("numberOfPlayers")}
+            <input id="numberOfPlayers" type="number" min={1} placeholder="5"
+              {...register("numberOfPlayers", { valueAsNumber: true })}
             />
           </div>
           <label htmlFor="rentalCost">Rental Cost:</label>
@@ -125,10 +125,12 @@ const ShuttleSplit = () => {
             {...register("rentalCost", { valueAsNumber: true })}
           />
           <label htmlFor="shuttleAmount">Shuttle Amount:</label>
-          <input id="shuttleAmount" type="number" min={1} placeholder="3" {...register("shuttleAmount")}
+          <input id="shuttleAmount" type="number" min={1} placeholder="3"
+            {...register("shuttleAmount", { valueAsNumber: true })}
           />
           <label htmlFor="shuttlePrice">Shuttle Prices</label>
-          <input id="shuttlePrice" type="number" min={1} placeholder="26" {...register("shuttlePrice")}
+          <input id="shuttlePrice" type="number" min={1} placeholder="26"
+            {...register("shuttlePrice", { valueAsNumber: true })}
           />
           <input className="btn btn-normal" type="submit" value="Calculate" />
         </form>
