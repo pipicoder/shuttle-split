@@ -22,7 +22,7 @@ export const httpPost = async (url: string, params?: any, data?: any): Promise<A
   return await axios({ ...config, url, method: "post", data })
 }
 
-export const httpGet = async (url: string, params?: any, data?: any): Promise<AxiosResponse<any, any, {}>> => {
+export const httpGet = async (url: string, params?: any): Promise<AxiosResponse<any, any, {}>> => {
   const config = { ...(await getConfig(url)), params }
-  return axios.post(url, data, config)
+  return await axios({ ...config, url, method: "get"})
 } 

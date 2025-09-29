@@ -3,6 +3,7 @@
   background-image: url('./../../assets/split-form-background.png');
   min-height: 100vh;
   height: 100%;
+  color: #39545e;
 }
 
 .shuttle-split-form {

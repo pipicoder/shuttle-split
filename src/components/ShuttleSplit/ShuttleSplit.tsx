@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form"
 import type { Template } from "../../common/models/Template"
 import { ShuttleSplitCalculationEquallyRequestForm, ShuttleSplitCalculationWeightedRequestForm } from "../../common/requestForm/HttpShuttleSplitCalculationRequest"
 import { HttpShuttleSplitCalculationResponse, type ShuttleSplitCalculationCost, } from "../../common/responseForm/HttpShuttleSplitCalculationResponse"
-import { httpPost } from "../../common/requestForm/HttpRequest"
+import { httpGet, httpPost } from "../../common/requestForm/HttpRequest"
+import { HttpShuttleSplitGetTemplatesResponse } from "../../common/responseForm/HttpShuttleSplitGetTemplatesResponse"
 
 const ShuttleSplit = () => {
 
@@ -66,11 +67,12 @@ const ShuttleSplit = () => {
   }
 
   useEffect(() => {
-    fetch('/api/sessions/templates')
-      .then((response) => response.json())
-      .then((res) => setTemplates(new Map(res?.data?.map((item: Template) => {
-        return [item.id, item]
-      }))))
+    httpGet('/api/sessions/templates')
+      .then((res) => {
+        const response = new HttpShuttleSplitGetTemplatesResponse(res.data)
+        setTemplates(response.getTemplateMap())
+      }
+      )
       .catch((error) => console.error('Error fetching data:', error));
   }, [
     calculationData
@@ -145,7 +147,6 @@ const ShuttleSplit = () => {
                   }
                 </tr>
               </thead>
-
               <tbody>
                 {
                   calculationData &&
