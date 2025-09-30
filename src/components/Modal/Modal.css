@@ -1,0 +1,53 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.modal__window {
+  position: relative;
+  background-color: white;
+  padding: 20px;
+  width: 100%;
+  max-width: 450px;
+  height: 100%;
+  max-height: 700px;
+  margin: auto;
+  border-radius: 4px;
+  background-image: url('../../assets/split-form-background.webp');
+  overflow: auto;
+}
+
+.modal__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 20px;
+}
+
+.modal-title {
+  margin: 10px 0;
+  padding: 10px 0;
+  border-bottom-width: thick;
+  border-style: none none solid none;
+}
+
+img {
+  height: 25px;
+}
+
+.close-icon:hover {
+  filter: brightness(0) saturate(100%) invert(29%) sepia(21%) saturate(630%) hue-rotate(150deg) brightness(96%) contrast(92%);
+}
+
+.close-icon {
+  filter: brightness(0) saturate(100%) invert(41%) sepia(70%) saturate(201%) hue-rotate(149deg) brightness(94%) contrast(90%);
+  cursor: pointer;
+}

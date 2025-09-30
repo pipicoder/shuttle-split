@@ -16,3 +16,24 @@ button {
 html {
   scroll-behavior: smooth;
 }
+
+.btn {
+  outline: 0;
+  border: 0;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 20px;
+  cursor: pointer;
+  padding: 16px;
+}
+
+.btn-normal {
+  background-color: #537b89;
+  color: white;
+}
+
+.btn-normal:hover {
+  background-color: #39545e;
+  font-weight: 600;
+}

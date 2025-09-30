@@ -4,6 +4,7 @@
   min-height: 100vh;
   height: 100%;
   color: #39545e;
+  box-sizing: border-box;
 }
 
 .shuttle-split-form {
@@ -18,36 +19,14 @@
   padding: 20px 0;
 }
 
-
 .shuttle-split-form img {
   margin: auto;
   height: 150px;
   display: block;
 }
 
-.btn {
-  outline: 0;
-  border: 0;
-  border-radius: 0;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 20px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
 .shuttle-split-form button:hover {
   opacity: 1;
-}
-
-.btn-normal {
-  background-color: #537b89;
-  color: white;
-}
-
-.btn-normal:hover {
-  background-color: #39545e;
-  font-weight: 600;
 }
 
 .shuttle-split-form form {
@@ -200,7 +179,7 @@ option::checkmark {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   /* -webkit-appearance: none; */
-  background: #FFF url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYlWNgwAT/sYhhKPiPT+F/LJgEsHv37v+EMGkmkuImoh2NoQAANlcun/q4OoYAAAAASUVORK5CYII=) no-repeat center center;
+  /* background: #FFF url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYlWNgwAT/sYhhKPiPT+F/LJgEsHv37v+EMGkmkuImoh2NoQAANlcun/q4OoYAAAAASUVORK5CYII=) no-repeat center center; */
   opacity: 0.8;
   /* shows Spin Buttons per default (Chrome >= 39) */
   position: absolute;
@@ -225,6 +204,7 @@ input[type=number] {
   max-width: 450px;
   margin: 30px auto;
   display: block;
+  position: relative;
 }
 
 .table {
@@ -234,8 +214,8 @@ input[type=number] {
 .table th {
   text-align: left;
   background-color: rgb(128, 128, 128, 0.5);
-  /* border-radius: 4px; */
   padding: 20px 5px;
+  color: white;
 }
 
 .table td {
@@ -253,4 +233,14 @@ input[type=number] {
   background-color: rgb(57, 84, 94, 0.9);
   color: white;
   font-size: 16px;
+}
+
+.download-ref {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+}
+
+.download-ref img {
+  height: 40px;
 }

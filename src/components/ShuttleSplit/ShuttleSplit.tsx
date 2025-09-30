@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useRef, useState, type ChangeEvent} from 'react'
+import { Fragment, useEffect, useRef, useState, type ChangeEvent, type RefObject } from 'react'
 import main_icon from '../../assets/main-icon.webp'
+import download_icon from '../../assets/download-icon.svg'
 
 import './ShuttleSplit.css'
 import { useForm } from "react-hook-form"
@@ -8,6 +9,8 @@ import { ShuttleSplitCalculationEquallyRequestForm, ShuttleSplitCalculationWeigh
 import { HttpShuttleSplitCalculationResponse, type ShuttleSplitCalculationCost, } from "../../common/responseForm/HttpShuttleSplitCalculationResponse"
 import { httpGet, httpPost } from "../../common/requestForm/HttpRequest"
 import { HttpShuttleSplitGetTemplatesResponse } from "../../common/responseForm/HttpShuttleSplitGetTemplatesResponse"
+import DownloadHTMLButton from "../DownloadHTMLButton/DownloadHTMLButton"
+import Modal from "../Modal/Modal"
 
 const ShuttleSplit = () => {
 
@@ -19,8 +22,10 @@ const ShuttleSplit = () => {
   const [selectedTemplateType, setSelectedTemplateType] = useState<string>(formTypeList[0])
   const [calculationData, setCalculationData] = useState<ShuttleSplitCalculationCost>();
   const { register, handleSubmit, setValue, reset, getValues, formState } = useForm();
+  const [targetModal, setTargetModal] = useState(false)
 
-  const scrollFocusRef = useRef<HTMLTableElement>(null)
+  const scrollFocusRef = useRef<HTMLTableElement | any>(null)
+  const [downloadRef, setDownLoadRef] = useState<RefObject<HTMLDivElement | undefined>>()
 
   const handleOnChangeTemplate = (event: ChangeEvent<HTMLSelectElement>) => {
     event.preventDefault()
@@ -41,6 +46,10 @@ const ShuttleSplit = () => {
   const handleListInput = (value: string) => {
     const valueList = typeof value === 'string' ? value.split(listSeparatorRegx) : getValues("players") || []
     return valueList.filter((item: string) => item.trim() !== "")
+  }
+
+  const handleBeforeDownLoad = () => {
+    setTargetModal(true)
   }
 
   const onSubmitForm = (formData: any) => {
@@ -73,7 +82,7 @@ const ShuttleSplit = () => {
           setTemplates(response.getTemplateMap())
         })
         .catch((error) => console.error('Error fetching data:', error));
-    calculationData && formState.isSubmitted && scrollFocusRef.current?.lastElementChild?.scrollIntoView({ behavior: "smooth" }) || ""
+    calculationData && formState.isSubmitted && scrollFocusRef.current?.scrollIntoView({ behavior: "smooth" }) || ""
   }, [
     calculationData
   ]);
@@ -133,9 +142,42 @@ const ShuttleSplit = () => {
           <input id="shuttlePrice" type="number" min={1} placeholder="26"
             {...register("shuttlePrice", { valueAsNumber: true })}
           />
-          <input className="btn btn-normal" type="submit" value="Calculate" disabled={formState.isSubmitting}/>
+          <input className="btn btn-normal" type="submit" value="Calculate" disabled={formState.isSubmitting} />
         </form>
       </div>
+      {
+        <Modal title="Results" setTarget={setTargetModal} target={targetModal} refer={downloadRef} setRefer={setDownLoadRef}>
+          <div className="costs-list" id="costs">
+            {
+              calculationData &&
+              <Fragment>
+                <table className="table" ref={scrollFocusRef}>
+                  <thead>
+                    <tr>
+                      {
+                        Object.keys(columns).map((k: string) => {
+                          return <th key={k}>{columns[k as keyof typeof columns]}</th>
+                        })
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      calculationData &&
+                      Object.keys(calculationData.cost).map((key: string, index) => {
+                        return <tr key={`_${index}`}>
+                          <td>{key}</td>
+                          <td>{calculationData.cost[key] || ""}</td>
+                        </tr>
+                      })
+                    }
+                  </tbody>
+                </table>
+              </Fragment>
+            }
+          </div>
+        </Modal>
+      }
       <div className="costs-list" id="costs">
         {
           calculationData &&
@@ -162,6 +204,9 @@ const ShuttleSplit = () => {
                 }
               </tbody>
             </table>
+            <div className="download-ref">
+              <DownloadHTMLButton svg={download_icon} refElement={scrollFocusRef} onBefore={handleBeforeDownLoad}></DownloadHTMLButton>
+            </div>
           </Fragment>
         }
       </div>
