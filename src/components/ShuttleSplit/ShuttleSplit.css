@@ -43,13 +43,15 @@
   margin: 5px 0;
 }
 
-.shuttle-split-form input {
+input {
   width: 100%;
   padding: 16px;
   margin: 10px 0;
   box-sizing: border-box;
   border-radius: 5px;
   border: 0;
+  background-color: #f9f9f9;
+  border-width: 0;
 }
 
 select,
@@ -192,7 +194,16 @@ input::-webkit-inner-spin-button {
 
 /* Firefox */
 input[type=number] {
+  
   -moz-appearance: textfield;
+}
+
+input[type="date"] {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+
 }
 
 .option {
@@ -209,6 +220,7 @@ input[type=number] {
 
 .table {
   width: 100%;
+  border-collapse: collapse;
 }
 
 .table th {

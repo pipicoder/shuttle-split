@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState, type ChangeEvent, type RefObject } from 'react'
+import { Fragment, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import main_icon from '../../assets/main-icon.webp'
 import download_icon from '../../assets/download-icon.svg'
 
@@ -11,6 +11,7 @@ import { httpGet, httpPost } from "../../common/requestForm/HttpRequest"
 import { HttpShuttleSplitGetTemplatesResponse } from "../../common/responseForm/HttpShuttleSplitGetTemplatesResponse"
 import DownloadHTMLButton from "../DownloadHTMLButton/DownloadHTMLButton"
 import Modal from "../Modal/Modal"
+// import DataTable from "../DataTable/DataTable"
 
 const ShuttleSplit = () => {
 
@@ -25,7 +26,7 @@ const ShuttleSplit = () => {
   const [targetModal, setTargetModal] = useState(false)
 
   const scrollFocusRef = useRef<HTMLTableElement | any>(null)
-  const [downloadRef, setDownLoadRef] = useState<RefObject<HTMLDivElement | undefined>>()
+  const downloadRef = useRef<HTMLDivElement | any>(null)
 
   const handleOnChangeTemplate = (event: ChangeEvent<HTMLSelectElement>) => {
     event.preventDefault()
@@ -50,6 +51,39 @@ const ShuttleSplit = () => {
 
   const handleBeforeDownLoad = () => {
     setTargetModal(true)
+    calculationData && formState.isSubmitted && downloadRef.current?.scrollIntoView({ behavior: "smooth" }) || ""
+  }
+
+  const renderCostsList = () => {
+    return (
+      <table className="table" ref={scrollFocusRef} id="costs-table">
+        <thead>
+          <tr>
+            <th colSpan={Object.keys(columns).length} style={{ backgroundColor: "unset", paddingTop: "0px", paddingBottom: "0px"}}>
+              <input type="date" {...register("latestDate")} />
+            </th>
+          </tr>
+          <tr>
+            {
+              Object.keys(columns).map((k: string) => {
+                return <th key={k}>{columns[k as keyof typeof columns]}</th>
+              })
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            calculationData &&
+            Object.keys(calculationData.cost).map((key: string, index) => {
+              return <tr key={`_${index}`}>
+                <td>{key}</td>
+                <td>{calculationData.cost[key] || ""}</td>
+              </tr>
+            })
+          }
+        </tbody>
+      </table>
+    )
   }
 
   const onSubmitForm = (formData: any) => {
@@ -146,64 +180,21 @@ const ShuttleSplit = () => {
         </form>
       </div>
       {
-        <Modal title="Results" setTarget={setTargetModal} target={targetModal} refer={downloadRef} setRefer={setDownLoadRef}>
+        <Modal title="Results" setTarget={setTargetModal} target={targetModal}>
           <div className="costs-list" id="costs">
             {
               calculationData &&
-              <Fragment>
-                <table className="table" ref={scrollFocusRef}>
-                  <thead>
-                    <tr>
-                      {
-                        Object.keys(columns).map((k: string) => {
-                          return <th key={k}>{columns[k as keyof typeof columns]}</th>
-                        })
-                      }
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      calculationData &&
-                      Object.keys(calculationData.cost).map((key: string, index) => {
-                        return <tr key={`_${index}`}>
-                          <td>{key}</td>
-                          <td>{calculationData.cost[key] || ""}</td>
-                        </tr>
-                      })
-                    }
-                  </tbody>
-                </table>
-              </Fragment>
+              renderCostsList()
             }
           </div>
         </Modal>
       }
-      <div className="costs-list" id="costs">
+      {/* <DataTable title="Players"></DataTable> */}
+      <div className="costs-list" id="costs" ref={downloadRef}>
         {
           calculationData &&
           <Fragment>
-            <table className="table" ref={scrollFocusRef}>
-              <thead>
-                <tr>
-                  {
-                    Object.keys(columns).map((k: string) => {
-                      return <th key={k}>{columns[k as keyof typeof columns]}</th>
-                    })
-                  }
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  calculationData &&
-                  Object.keys(calculationData.cost).map((key: string, index) => {
-                    return <tr key={`_${index}`}>
-                      <td>{key}</td>
-                      <td>{calculationData.cost[key] || ""}</td>
-                    </tr>
-                  })
-                }
-              </tbody>
-            </table>
+            {renderCostsList()}
             <div className="download-ref">
               <DownloadHTMLButton svg={download_icon} refElement={scrollFocusRef} onBefore={handleBeforeDownLoad}></DownloadHTMLButton>
             </div>
@@ -213,5 +204,6 @@ const ShuttleSplit = () => {
     </div>
   )
 }
+
 
 export default ShuttleSplit

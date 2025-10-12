@@ -6,4 +6,5 @@ export type Template = {
   shuttleAmount?: number,
   shuttlePrice?: number,
   players?: Array<string>[]
+  latestDate: string
 }

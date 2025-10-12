@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react"
+import { useEffect } from "react"
 import close_button_icon from "../../assets/close-button.svg"
 import './Modal.css'
 
@@ -6,20 +6,15 @@ export type ModalProps = {
   title: string
   setTarget: (enable: boolean) => void
   target: boolean
-  refer?: RefObject<HTMLDivElement | any> | undefined
-  setRefer?: React.Dispatch<React.SetStateAction<RefObject<HTMLDivElement | undefined> | undefined>>
 }
 
-const Modal = ({ title, target, children, setRefer, setTarget }: React.PropsWithChildren<ModalProps>) => {
-
-  const ref = useRef<HTMLDivElement | any>(null)
+const Modal = ({ title, target, children, setTarget }: React.PropsWithChildren<ModalProps>) => {
 
   useEffect(() => {
-    if (setRefer) setRefer(ref)
   }, [])
 
   return (
-    <div className="modal" ref={ref} style={
+    <div className="modal" style={
       {
         visibility: !target ? "hidden" : "visible",
         opacity: !target ? 0 : 1
